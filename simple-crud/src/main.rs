@@ -11,7 +11,7 @@ struct AppState {
 
 #[get("/")]
 async fn index() -> &'static str {
-    "Root of Goodbye World API - A note taking app that has a bad name"
+    "Root of Goodbye World API - A note taking app that is badly named"
 }
 
 #[actix_web::main]
