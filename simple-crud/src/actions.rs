@@ -1,6 +1,10 @@
 use diesel::prelude::*;
 
-use crate::models::*;
+use crate::models::{
+    Note,
+    NewNote,
+    NoteForm
+};
 use crate::schema;
 
 use schema::notes::dsl::*;
@@ -17,7 +21,7 @@ pub fn insert_new_note(conn: &PgConnection, new_note: NewNote) -> QueryResult<()
     Ok(())
 }
 
-pub fn remove_note(conn: &PgConnection, note: Note) -> QueryResult<()> {
+pub fn remove_note(conn: &PgConnection, note: &Note) -> QueryResult<()> {
     remove_note_with_id(conn, note.id)
 }
 

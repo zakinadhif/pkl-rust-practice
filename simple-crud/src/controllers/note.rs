@@ -1,9 +1,8 @@
 use crate::AppState;
-use actix_web::{web, get, post, put, delete, Responder, HttpResponse, error, Result};
-use goodbye_world::{actions, models::*};
+use actix_web::{web, Responder, HttpResponse, error, Result};
+use goodbye_world::{actions, models::{NoteForm, NewNote}};
 
-#[get("")]
-async fn index(app_state: web::Data<AppState>) -> impl Responder {
+pub async fn index(app_state: web::Data<AppState>) -> impl Responder {
     match actions::index_notes(&app_state.db) {
         Ok(notes) => {
             Ok(web::Json(notes))
@@ -15,8 +14,7 @@ async fn index(app_state: web::Data<AppState>) -> impl Responder {
     }
 }
 
-#[get("/{note_id}")]
-async fn read(app_state: web::Data<AppState>, note_id: web::Path<i32>) -> Result<impl Responder> {
+pub async fn read(app_state: web::Data<AppState>, note_id: web::Path<i32>) -> Result<impl Responder> {
     let note_id = note_id.into_inner();
 
     match actions::read_note(&app_state.db, note_id) {
@@ -30,8 +28,7 @@ async fn read(app_state: web::Data<AppState>, note_id: web::Path<i32>) -> Result
     }
 }
 
-#[post("")]
-async fn insert(app_state: web::Data<AppState>, note: web::Json<NoteForm>) -> impl Responder {
+pub async fn insert(app_state: web::Data<AppState>, note: web::Json<NoteForm>) -> impl Responder {
     let new_note = NewNote {
         title: note.title.as_str(),
         body: note.title.as_str()
@@ -45,8 +42,7 @@ async fn insert(app_state: web::Data<AppState>, note: web::Json<NoteForm>) -> im
     HttpResponse::Ok()
 }
 
-#[put("/{note_id}")]
-async fn update(app_state: web::Data<AppState>, note_form: web::Json<NoteForm>, note_id: web::Path<i32>) -> impl Responder {
+pub async fn update(app_state: web::Data<AppState>, note_form: web::Json<NoteForm>, note_id: web::Path<i32>) -> impl Responder {
     let note_id = note_id.into_inner();
 
     if let Err(e) = actions::update_note(&app_state.db, note_id, &note_form) {
@@ -57,8 +53,7 @@ async fn update(app_state: web::Data<AppState>, note_form: web::Json<NoteForm>, 
     HttpResponse::Ok()
 }
 
-#[delete("/{note_id}")]
-async fn remove(app_state: web::Data<AppState>, note_id: web::Path<i32>) -> impl Responder {
+pub async fn remove(app_state: web::Data<AppState>, note_id: web::Path<i32>) -> impl Responder {
     let note_id = note_id.into_inner();
 
     if let Err(e) = actions::remove_note_with_id(&app_state.db, note_id) {

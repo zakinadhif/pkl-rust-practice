@@ -1,12 +1,16 @@
 mod controllers;
 
-use diesel::PgConnection;
-use actix_web::{App, HttpServer, web, get};
 use goodbye_world::establish_connection;
 use controllers::note;
 
-struct AppState {
-    db: PgConnection 
+use diesel::PgConnection;
+use actix_web::{App, HttpServer, web, get};
+use dotenv::dotenv;
+
+use std::env;
+
+pub struct AppState {
+    db: PgConnection
 }
 
 #[get("/")]
@@ -16,6 +20,13 @@ async fn index() -> &'static str {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    dotenv().ok();
+
+    let port = env::var("PORT")
+        .unwrap_or("8080".to_owned())
+        .parse()
+        .expect("PORT env variable must be an integer");
+
     HttpServer::new(|| {
         App::new()
             .app_data(web::Data::new(AppState {
@@ -24,14 +35,14 @@ async fn main() -> std::io::Result<()> {
             .service(index)
             .service(
                 web::scope("/notes")
-                    .service(note::index)
-                    .service(note::insert)
-                    .service(note::remove)
-                    .service(note::update)
-                    .service(note::read)
+                    .route("", web::get().to(note::index))
+                    .route("", web::post().to(note::insert))
+                    .route("/{note_id}", web::delete().to(note::remove))
+                    .route("/{note_id}", web::put().to(note::update))
+                    .route("/{note_id}", web::get().to(note::read))
             )
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(("127.0.0.1", port))?
     .run()
     .await
 }
