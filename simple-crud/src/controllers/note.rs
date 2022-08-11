@@ -1,6 +1,10 @@
-use crate::AppState;
 use actix_web::{web, Responder, HttpResponse, error, Result};
-use goodbye_world::{actions, models::{NoteForm, NewNote}};
+
+use crate::AppState;
+use goodbye_world::{
+    actions::note as actions,
+    models::{NoteForm, NewNote}
+};
 
 pub async fn index(app_state: web::Data<AppState>) -> impl Responder {
     match actions::index_notes(&app_state.db) {
